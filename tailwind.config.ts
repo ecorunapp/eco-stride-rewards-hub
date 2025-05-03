@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				eco: {
+					light: '#8AE9C1',
+					DEFAULT: '#43A047',
+					dark: '#2E7D32',
+				},
+				coin: {
+					light: '#FFD54F',
+					DEFAULT: '#FFC107',
+					dark: '#FFA000',
 				}
 			},
 			borderRadius: {
@@ -84,11 +95,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-scale': {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(1.05)' },
+				},
+				'coin-flip': {
+					'0%': { transform: 'rotateY(0deg)' },
+					'100%': { transform: 'rotateY(360deg)' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-scale': 'pulse-scale 2s ease-in-out infinite',
+				'coin-flip': 'coin-flip 0.5s ease-in-out',
 			}
 		}
 	},
