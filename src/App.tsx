@@ -8,6 +8,7 @@ import Wallet from "./pages/Wallet";
 import Explore from "./pages/Explore";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
+import Meet from "./pages/Meet";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="explore" element={<Explore />} />
             <Route path="history" element={<History />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="meet" element={<Meet />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
