@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, Route } from "lucide-react";
 import PartnerStore from "@/components/explore/PartnerStore";
 import { mockPartnerStores } from "@/data/mockData";
 

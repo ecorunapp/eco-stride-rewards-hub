@@ -1,7 +1,6 @@
-
-import React, { useState } from "react";
-import { Button } from "@/components/ui/card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import EcoTabCard from "@/components/wallet/EcoTabCard";
