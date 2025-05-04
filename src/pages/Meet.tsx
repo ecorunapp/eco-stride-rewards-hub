@@ -4,14 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Calendar, Clock, User } from "lucide-react";
+import { MapPin, Calendar, Clock, User, Bell, Users, Walk, Award, Shield } from "lucide-react";
 import RunnerMatch from "@/components/meet/RunnerMatch";
 import ScheduledSession from "@/components/meet/ScheduledSession";
-import { mockRunnerMatches, mockScheduledSessions } from "@/data/mockMeetData";
+import SparkStage from "@/components/meet/SparkStage";
+import SafetyControls from "@/components/meet/SafetyControls";
+import { mockRunnerMatches, mockScheduledSessions, mockCompletedSessions } from "@/data/mockMeetData";
+import { Badge } from "@/components/ui/badge";
 
 const Meet = () => {
-  const [activeTab, setActiveTab] = useState<"matches" | "scheduled" | "history">("matches");
+  const [activeTab, setActiveTab] = useState<"matches" | "scheduled" | "history" | "spark" | "safety">("matches");
   const [locationRadius, setLocationRadius] = useState<number>(5); // in km
+  const [activityType, setActivityType] = useState<"all" | "walk" | "run">("all");
 
   return (
     <div className="space-y-6">
@@ -23,10 +27,12 @@ const Meet = () => {
       </div>
       
       <Tabs defaultValue="matches" onValueChange={(value) => setActiveTab(value as any)}>
-        <TabsList className="grid grid-cols-3 w-full">
+        <TabsList className="grid w-full sm:grid-cols-5 grid-cols-3">
           <TabsTrigger value="matches">Find Runners</TabsTrigger>
           <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+          <TabsTrigger value="spark">Spark Stages</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="safety">Safety</TabsTrigger>
         </TabsList>
         
         <TabsContent value="matches" className="pt-4">
@@ -50,6 +56,37 @@ const Meet = () => {
                     <span className="text-sm font-medium">{locationRadius} km</span>
                   </div>
                 </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Activity Type</label>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={activityType === "all" ? "default" : "outline"}
+                      size="sm" 
+                      onClick={() => setActivityType("all")}
+                      className={activityType === "all" ? "bg-eco hover:bg-eco-dark" : ""}
+                    >
+                      All
+                    </Button>
+                    <Button 
+                      variant={activityType === "walk" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setActivityType("walk")}
+                      className={activityType === "walk" ? "bg-eco hover:bg-eco-dark" : ""}
+                    >
+                      <Walk size={16} className="mr-1" /> Walk
+                    </Button>
+                    <Button 
+                      variant={activityType === "run" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setActivityType("run")}
+                      className={activityType === "run" ? "bg-eco hover:bg-eco-dark" : ""}
+                    >
+                      <Users size={16} className="mr-1" /> Run
+                    </Button>
+                  </div>
+                </div>
+                
                 <Button className="bg-eco hover:bg-eco-dark">Update Preferences</Button>
               </div>
             </CardContent>
@@ -85,13 +122,30 @@ const Meet = () => {
         </TabsContent>
         
         <TabsContent value="history" className="pt-4">
-          <div className="text-center py-10">
-            <Clock className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
-            <h3 className="mt-4 text-lg font-semibold">No session history yet</h3>
-            <p className="text-muted-foreground mt-2">
-              Your completed sessions will appear here
-            </p>
-          </div>
+          {mockCompletedSessions.length > 0 ? (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Completed Sessions</h2>
+              {mockCompletedSessions.map((session) => (
+                <ScheduledSession key={session.id} session={session} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <Clock className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
+              <h3 className="mt-4 text-lg font-semibold">No session history yet</h3>
+              <p className="text-muted-foreground mt-2">
+                Your completed sessions will appear here
+              </p>
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="spark" className="pt-4">
+          <SparkStage />
+        </TabsContent>
+        
+        <TabsContent value="safety" className="pt-4">
+          <SafetyControls />
         </TabsContent>
       </Tabs>
     </div>

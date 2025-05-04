@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Calendar, User } from "lucide-react";
+import { MapPin, Calendar, User, Award } from "lucide-react";
 import { RunnerMatchType } from "@/data/mockMeetData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 interface RunnerMatchProps {
@@ -17,6 +18,7 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [meetingLocation, setMeetingLocation] = useState<string>("");
+  const [activityType, setActivityType] = useState<"walk" | "run">("walk");
 
   const handleScheduleSession = () => {
     if (!selectedDate || !selectedTime || !meetingLocation) {
@@ -25,7 +27,7 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
     }
 
     // Here we would normally send this to an API
-    toast.success(`Session scheduled with ${match.name}!`);
+    toast.success(`${activityType.charAt(0).toUpperCase() + activityType.slice(1)} session scheduled with ${match.name}!`);
     setIsDialogOpen(false);
   };
 
@@ -39,7 +41,22 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
           </Avatar>
           
           <div className="flex-1">
-            <h3 className="font-semibold">{match.name}</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">{match.name}</h3>
+              {match.sparkStage && (
+                <Badge className={
+                  match.sparkStage === "friend" ? "bg-blue-500" :
+                  match.sparkStage === "bond" ? "bg-purple-500" : "bg-pink-500"
+                }>
+                  {match.sparkStage.charAt(0).toUpperCase() + match.sparkStage.slice(1)}
+                </Badge>
+              )}
+              {match.badges && match.badges.length > 0 && (
+                <div className="flex">
+                  <Award size={16} className="text-yellow-500" title={match.badges[0]} />
+                </div>
+              )}
+            </div>
             <div className="flex items-center text-xs text-muted-foreground mt-1">
               <MapPin size={12} className="mr-1" />
               <span>{match.distance} km away • {match.location}</span>
@@ -59,6 +76,29 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
                 <DialogTitle>Schedule a Session</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label htmlFor="activity-type" className="text-sm font-medium">Activity Type</label>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button"
+                      variant={activityType === "walk" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setActivityType("walk")}
+                      className={activityType === "walk" ? "bg-eco hover:bg-eco-dark flex-1" : "flex-1"}
+                    >
+                      Walk Together
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant={activityType === "run" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setActivityType("run")}
+                      className={activityType === "run" ? "bg-eco hover:bg-eco-dark flex-1" : "flex-1"}
+                    >
+                      Run Together
+                    </Button>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <label htmlFor="date" className="text-sm font-medium">Date</label>
                   <input
@@ -94,7 +134,7 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
                   onClick={handleScheduleSession} 
                   className="w-full bg-eco hover:bg-eco-dark mt-2"
                 >
-                  Schedule Session
+                  Schedule {activityType.charAt(0).toUpperCase() + activityType.slice(1)}
                 </Button>
               </div>
             </DialogContent>
