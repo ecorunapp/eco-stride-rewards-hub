@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Coins } from "lucide-react";
 import StepCounter from "@/components/home/StepCounter";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
+import MoveMateFeature from "@/components/home/MoveMateFeature";
 import { mockUser } from "@/data/mockData";
 import { toast } from "sonner";
 
@@ -96,6 +97,9 @@ const Index = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* MoveMate+ Feature */}
+      <MoveMateFeature />
     </div>
   );
 };
