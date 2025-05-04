@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Accessibility, Navigation, Store, Bike, Scooter, MapPin } from "lucide-react";
+import { Accessibility, Navigation, Store, Bike, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -133,7 +133,7 @@ const MoveMateFeature: React.FC = () => {
         ) : type === "bike" ? (
           <Bike className={`h-5 w-5 ${colorClass}`} />
         ) : (
-          <Scooter className={`h-5 w-5 ${colorClass}`} />
+          <Bike className={`h-5 w-5 ${colorClass}`} />
         )}
       </div>
     );
@@ -285,7 +285,7 @@ const MoveMateFeature: React.FC = () => {
                   ) : option.type === "bike" ? (
                     <Bike className={`h-4 w-4 ${option.availability === 'available' ? 'text-green-500' : option.availability === 'charging' ? 'text-amber-500' : 'text-red-500'}`} />
                   ) : (
-                    <Scooter className={`h-4 w-4 ${option.availability === 'available' ? 'text-green-500' : option.availability === 'charging' ? 'text-amber-500' : 'text-red-500'}`} />
+                    <Bike className={`h-4 w-4 ${option.availability === 'available' ? 'text-green-500' : option.availability === 'charging' ? 'text-amber-500' : 'text-red-500'}`} />
                   )}
                 </div>
                 <div className="ml-2">
