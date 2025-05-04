@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Coins } from "lucide-react";
 import StepCounter from "@/components/home/StepCounter";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import MoveMateFeature from "@/components/home/MoveMateFeature";
+import RunfluenceFeature from "@/components/home/RunfluenceFeature";
 import { mockUser } from "@/data/mockData";
 import { toast } from "sonner";
 
@@ -99,6 +101,9 @@ const Index = () => {
 
       {/* MoveMate+ Feature */}
       <MoveMateFeature />
+      
+      {/* Runfluence+ Feature */}
+      <RunfluenceFeature />
     </div>
   );
 };
