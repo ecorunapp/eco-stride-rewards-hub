@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Calendar, Clock, User, Bell, Users, Walk, Award, Shield } from "lucide-react";
+import { MapPin, Calendar, Clock, User, Bell, Users, Bike, Award, Shield } from "lucide-react";
 import RunnerMatch from "@/components/meet/RunnerMatch";
 import ScheduledSession from "@/components/meet/ScheduledSession";
 import SparkStage from "@/components/meet/SparkStage";
@@ -74,7 +73,7 @@ const Meet = () => {
                       onClick={() => setActivityType("walk")}
                       className={activityType === "walk" ? "bg-eco hover:bg-eco-dark" : ""}
                     >
-                      <Walk size={16} className="mr-1" /> Walk
+                      <Bike size={16} className="mr-1" /> Walk
                     </Button>
                     <Button 
                       variant={activityType === "run" ? "default" : "outline"} 

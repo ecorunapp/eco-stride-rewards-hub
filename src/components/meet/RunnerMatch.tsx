@@ -53,7 +53,7 @@ const RunnerMatch: React.FC<RunnerMatchProps> = ({ match }) => {
               )}
               {match.badges && match.badges.length > 0 && (
                 <div className="flex">
-                  <Award size={16} className="text-yellow-500" title={match.badges[0]} />
+                  <Award size={16} className="text-yellow-500" aria-label={match.badges[0]} />
                 </div>
               )}
             </div>

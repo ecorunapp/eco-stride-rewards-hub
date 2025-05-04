@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, MapPin, Award, Walk, User } from "lucide-react";
+import { Calendar, Clock, MapPin, Award, Bike, User } from "lucide-react";
 import { SessionType } from "@/data/mockMeetData";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
