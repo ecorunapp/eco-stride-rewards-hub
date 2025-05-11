@@ -8,11 +8,14 @@ import EcoTabCard from "@/components/wallet/EcoTabCard";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import { mockUser, mockTransactions } from "@/data/mockData";
 import { format } from "date-fns";
+import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
 
 const Wallet = () => {
   const [balance, setBalance] = useState(mockUser.ecoCoins);
   const [cardBalance, setCardBalance] = useState(200); // Example starting card balance
   const [transferAmount, setTransferAmount] = useState(50);
+  const [isCardDialogOpen, setIsCardDialogOpen] = useState(false);
+  const [isCardActivated, setIsCardActivated] = useState(true); // Set to false to require activation
 
   const handleTransfer = () => {
     if (transferAmount <= 0) {
@@ -29,6 +32,16 @@ const Wallet = () => {
     setCardBalance(prev => prev + transferAmount);
     
     toast.success(`Transferred ${transferAmount} ecoCoins to your EcoTab Card`);
+  };
+
+  const handleCardClick = () => {
+    setIsCardDialogOpen(true);
+  };
+
+  const handleActivateCard = () => {
+    // Here you would typically process a payment of 60 AED
+    toast.success("Card purchase successful! Your EcoTab Card is now active.");
+    setIsCardActivated(true);
   };
 
   return (
@@ -60,23 +73,34 @@ const Wallet = () => {
               <button 
                 onClick={handleTransfer}
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-9 px-4 py-2 bg-eco text-white hover:bg-eco-dark"
+                disabled={!isCardActivated}
               >
                 Transfer
               </button>
             </div>
+            
+            {!isCardActivated && (
+              <div className="text-xs text-amber-600 mb-4">
+                You need to activate your EcoTab Card first
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
       
       <div className="pt-2">
         <h2 className="text-lg font-semibold mb-3">EcoTab Card</h2>
-        <EcoTabCard 
-          balance={cardBalance} 
-          cardNumber={mockUser.ecotabCardNumber}
-          userName={mockUser.name}
-        />
+        <div onClick={handleCardClick} className="cursor-pointer">
+          <EcoTabCard 
+            balance={cardBalance} 
+            cardNumber={mockUser.ecotabCardNumber}
+            userName={mockUser.name}
+          />
+        </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          Use your EcoTab Card at partner stores to redeem rewards
+          {isCardActivated 
+            ? "Use your EcoTab Card at partner stores to redeem rewards"
+            : "Activate your card to start using it at partner stores"}
         </p>
       </div>
       
@@ -102,6 +126,15 @@ const Wallet = () => {
           ))}
         </div>
       </div>
+      
+      <EcoTabActivationDialog
+        isOpen={isCardDialogOpen}
+        onClose={() => setIsCardDialogOpen(false)}
+        cardBalance={cardBalance}
+        ecoCoinsBalance={balance}
+        onPurchase={handleActivateCard}
+        isActivated={isCardActivated}
+      />
     </div>
   );
 };
