@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,12 @@ interface Task {
   distance: number;
   coins: number;
   estimatedTime: string;
+}
+
+export interface ActiveTask extends Task {
+  transportMode: TransportOption;
+  startTime: number; // timestamp when task started
+  status: "in-progress" | "completed" | "canceled";
 }
 
 interface TaskDetailDialogProps {
@@ -38,6 +43,17 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
     }
     
     setIsStarting(true);
+    
+    // Create active task object
+    const activeTask: ActiveTask = {
+      ...task,
+      transportMode,
+      startTime: Date.now(),
+      status: "in-progress"
+    };
+    
+    // Save to local storage
+    localStorage.setItem("ecoDropActiveTask", JSON.stringify(activeTask));
     
     // Simulate starting the task
     setTimeout(() => {

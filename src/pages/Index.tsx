@@ -9,6 +9,7 @@ import { mockUser } from "@/data/mockData";
 import { toast } from "sonner";
 import StepTrackerDialog from "@/components/home/StepTrackerDialog";
 import EcoDropTasksDialog from "@/components/explore/EcoDropTasksDialog";
+import TaskTimeline from "@/components/explore/TaskTimeline";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -255,6 +256,9 @@ const Index = () => {
         isOpen={isTasksDialogOpen}
         onClose={handleCloseTasksDialog}
       />
+      
+      {/* Task Timeline */}
+      <TaskTimeline />
     </div>
   );
 };
