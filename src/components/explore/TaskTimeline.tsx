@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { MapPin, Timer, CircleCheck } from "lucide-react";
+import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package } from "lucide-react";
 import { toast } from "sonner";
 import { ActiveTask } from "./TaskDetailDialog";
 
@@ -11,6 +11,15 @@ const TaskTimeline: React.FC = () => {
   const [activeTask, setActiveTask] = useState<ActiveTask | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [currentStage, setCurrentStage] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const stages = [
+    { name: "Pick Up", icon: <Package className="h-4 w-4" />, complete: false },
+    { name: "In Transit", icon: <Navigation className="h-4 w-4" />, complete: false },
+    { name: "Delivery", icon: <MapPin className="h-4 w-4" />, complete: false },
+    { name: "Complete", icon: <CircleCheck className="h-4 w-4" />, complete: false },
+  ];
   
   useEffect(() => {
     // Load active task from local storage if it exists
@@ -33,6 +42,17 @@ const TaskTimeline: React.FC = () => {
         const estimatedSeconds = estimatedMinutes * 60;
         const calculatedProgress = Math.min((timeElapsed / estimatedSeconds) * 100, 100);
         setProgress(calculatedProgress);
+        
+        // Update the current stage based on progress
+        if (calculatedProgress < 25) {
+          setCurrentStage(0);
+        } else if (calculatedProgress < 50) {
+          setCurrentStage(1);
+        } else if (calculatedProgress < 75) {
+          setCurrentStage(2);
+        } else {
+          setCurrentStage(3);
+        }
       }
     }, 1000);
     
@@ -68,12 +88,16 @@ const TaskTimeline: React.FC = () => {
       setActiveTask(null);
     }
   };
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
   
   if (!activeTask) return null;
   
   return (
-    <Card className="border-purple-300 dark:border-purple-800 fixed bottom-20 left-4 right-4 z-20 shadow-lg">
-      <CardContent className="p-3">
+    <Card className={`border-purple-300 dark:border-purple-800 fixed ${isExpanded ? 'top-4 bottom-20' : 'bottom-20'} left-4 right-4 z-20 shadow-lg transition-all duration-300`}>
+      <CardContent className={`p-3 ${isExpanded ? 'h-full flex flex-col' : ''}`}>
         <div className="flex items-center justify-between mb-2">
           <div>
             <h3 className="text-sm font-medium">{activeTask.storeName}</h3>
@@ -99,11 +123,50 @@ const TaskTimeline: React.FC = () => {
             style={{ width: `${progress}%` }}
           />
         </Progress>
+
+        <div className="flex items-center justify-between mb-2">
+          {stages.map((stage, index) => (
+            <div 
+              key={index} 
+              className={`flex flex-col items-center ${
+                index === currentStage ? 'text-purple-600' : 
+                index < currentStage ? 'text-green-500' : 'text-gray-400'
+              }`}
+            >
+              <div className={`rounded-full p-1 ${
+                index === currentStage ? 'bg-purple-100 border border-purple-300' : 
+                index < currentStage ? 'bg-green-100' : 'bg-gray-100'
+              }`}>
+                {index < currentStage ? <CheckCircle className="h-4 w-4" /> : stage.icon}
+              </div>
+              <span className="text-[10px] mt-1">{stage.name}</span>
+            </div>
+          ))}
+        </div>
+        
+        {isExpanded && (
+          <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-md mb-2 overflow-hidden relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <Navigation className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+                <p className="text-sm font-medium">Navigation View</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Follow the route to {activeTask.storeName}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="flex items-center justify-between">
-          <div className="text-xs">
-            <span className="font-medium">Status:</span> {progress < 100 ? "In progress" : "Ready to complete"}
-          </div>
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={toggleExpand} 
+            className="h-7 text-xs"
+          >
+            {isExpanded ? "Hide Map" : "Show Map"}
+          </Button>
           
           <Button 
             size="sm" 
