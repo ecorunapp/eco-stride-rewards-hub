@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,12 +7,14 @@ import { useNavigate } from "react-router-dom";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import { mockUser } from "@/data/mockData";
 import { toast } from "sonner";
+import StepTrackerDialog from "@/components/home/StepTrackerDialog";
 
 const Index = () => {
   const navigate = useNavigate();
   const [steps, setSteps] = useState(mockUser.totalSteps);
   const [ecoCoins, setEcoCoins] = useState(mockUser.ecoCoins);
   const [isWalking, setIsWalking] = useState(false);
+  const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const goal = mockUser.dailyGoal;
   const goalCompletion = Math.min((steps / goal) * 100, 100);
   
@@ -47,14 +48,25 @@ const Index = () => {
 
   const handleStartStop = () => {
     setIsWalking(!isWalking);
+    if (!isWalking && !isTrackerOpen) {
+      setIsTrackerOpen(true);
+    }
+  };
+
+  const handleCloseTracker = () => {
+    setIsTrackerOpen(false);
+    setIsWalking(false);
   };
 
   const coinsToday = Math.floor(steps / 100);
 
   // Feature navigation handlers
   const handleEcoRunClick = () => {
-    // For now we'll just show a tracking dialog on the home page
-    setIsWalking(!isWalking);
+    // Open the tracker dialog instead of just toggling walking
+    setIsTrackerOpen(true);
+    if (!isWalking) {
+      setIsWalking(true);
+    }
   };
   
   const handleEcoTabClick = () => {
@@ -218,6 +230,17 @@ const Index = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Step Tracker Dialog */}
+      <StepTrackerDialog 
+        isOpen={isTrackerOpen}
+        onClose={handleCloseTracker}
+        steps={steps}
+        goalSteps={goal}
+        ecoCoins={coinsToday}
+        isWalking={isWalking}
+        onStartStop={handleStartStop}
+      />
     </div>
   );
 };
