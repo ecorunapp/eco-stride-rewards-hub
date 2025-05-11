@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Bike, Car, Package, EvScooter, Walk } from "lucide-react";
+import { Bike, Car, Package, Footprints, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 interface Task {
@@ -96,7 +96,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                   className="flex flex-col items-center justify-center w-full h-[70px] rounded-lg border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-50 dark:data-[state=checked]:bg-purple-900/20"
                   data-state={transportMode === "walk" ? "checked" : "unchecked"}
                 >
-                  <Walk className="h-5 w-5 mb-1" />
+                  <Footprints className="h-5 w-5 mb-1" />
                   <span className="text-xs">Walk</span>
                   <RadioGroupItem value="walk" id="walk-option" className="sr-only" />
                 </label>
@@ -108,7 +108,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                   className="flex flex-col items-center justify-center w-full h-[70px] rounded-lg border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-50 dark:data-[state=checked]:bg-purple-900/20"
                   data-state={transportMode === "run" ? "checked" : "unchecked"}
                 >
-                  <Walk className="h-5 w-5 mb-1" />
+                  <Zap className="h-5 w-5 mb-1" />
                   <span className="text-xs">Run</span>
                   <RadioGroupItem value="run" id="run-option" className="sr-only" />
                 </label>
@@ -120,7 +120,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                   className="flex flex-col items-center justify-center w-full h-[70px] rounded-lg border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-50 dark:data-[state=checked]:bg-purple-900/20"
                   data-state={transportMode === "scooter" ? "checked" : "unchecked"}
                 >
-                  <EvScooter className="h-5 w-5 mb-1" />
+                  <Bike className="h-5 w-5 mb-1" />
                   <span className="text-xs">Scooter</span>
                   <RadioGroupItem value="scooter" id="scooter-option" className="sr-only" />
                 </label>
