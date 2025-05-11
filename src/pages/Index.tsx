@@ -8,6 +8,7 @@ import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import { mockUser } from "@/data/mockData";
 import { toast } from "sonner";
 import StepTrackerDialog from "@/components/home/StepTrackerDialog";
+import EcoDropTasksDialog from "@/components/explore/EcoDropTasksDialog";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Index = () => {
   const [ecoCoins, setEcoCoins] = useState(mockUser.ecoCoins);
   const [isWalking, setIsWalking] = useState(false);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
+  const [isTasksDialogOpen, setIsTasksDialogOpen] = useState(false);
   const goal = mockUser.dailyGoal;
   const goalCompletion = Math.min((steps / goal) * 100, 100);
   
@@ -58,6 +60,10 @@ const Index = () => {
     setIsWalking(false);
   };
 
+  const handleCloseTasksDialog = () => {
+    setIsTasksDialogOpen(false);
+  };
+
   const coinsToday = Math.floor(steps / 100);
 
   // Feature navigation handlers
@@ -79,6 +85,11 @@ const Index = () => {
   
   const handleRunfluenceClick = () => {
     navigate("/meet");
+  };
+
+  const handleFindTasksClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTasksDialogOpen(true);
   };
 
   return (
@@ -184,10 +195,7 @@ const Index = () => {
               <p className="text-xs text-muted-foreground mt-1">Local tasks & deliveries</p>
               <div className="mt-3 flex justify-center">
                 <Button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEcoDropClick();
-                  }}
+                  onClick={handleFindTasksClick}
                   variant="outline" 
                   className="border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 text-xs"
                   size="sm"
@@ -240,6 +248,12 @@ const Index = () => {
         ecoCoins={coinsToday}
         isWalking={isWalking}
         onStartStop={handleStartStop}
+      />
+
+      {/* EcoDrop Tasks Dialog */}
+      <EcoDropTasksDialog
+        isOpen={isTasksDialogOpen}
+        onClose={handleCloseTasksDialog}
       />
     </div>
   );
