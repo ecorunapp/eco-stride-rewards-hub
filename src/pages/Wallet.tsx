@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { mockUser, mockTransactions, mockGiftCards } from "@/data/mockData";
 import { format } from "date-fns";
 import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
 import GiftCard from "@/components/wallet/GiftCard";
-import { Gift } from "lucide-react";
+import { Gift, Wallet as WalletIcon, Ticket } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Wallet = () => {
@@ -56,6 +55,31 @@ const Wallet = () => {
     setIsCardActivated(true);
   };
 
+  // Enhanced gift cards with flight ticket data
+  const enhancedGiftCards = mockGiftCards.map(card => {
+    const destinations = {
+      "Starbucks": { origin: "MSQ", destination: "GVA", color: "#FF719A" },
+      "Amazon": { origin: "JDP", destination: "DXB", color: "#6E59A5" },
+      "Nike": { origin: "NYC", destination: "SFO", color: "#FEF7CD" },
+      "Spotify": { origin: "LAX", destination: "LDN", color: "#9b87f5" }
+    };
+    
+    const cardInfo = destinations[card.name] || { origin: card.name.substring(0, 3).toUpperCase(), destination: "ECO", color: card.backgroundColor };
+    
+    return {
+      ...card,
+      backgroundColor: cardInfo.color || card.backgroundColor,
+      origin: cardInfo.origin,
+      destination: cardInfo.destination,
+      date: "16 June 2024",
+      details: {
+        terminal: "C1",
+        seat: "B12",
+        gate: "A"
+      }
+    };
+  });
+
   return (
     <div className="space-y-6 pb-20">
       <div>
@@ -65,9 +89,18 @@ const Wallet = () => {
       
       <Tabs defaultValue="balance" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="balance">Balance</TabsTrigger>
-          <TabsTrigger value="ecotab">EcoTab Card</TabsTrigger>
-          <TabsTrigger value="gifts">Gift Cards</TabsTrigger>
+          <TabsTrigger value="balance">
+            <WalletIcon className="h-4 w-4 mr-2" />
+            Balance
+          </TabsTrigger>
+          <TabsTrigger value="ecotab">
+            <WalletIcon className="h-4 w-4 mr-2" />
+            EcoTab Card
+          </TabsTrigger>
+          <TabsTrigger value="gifts">
+            <Ticket className="h-4 w-4 mr-2" />
+            Gift Cards
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="balance">
@@ -151,25 +184,25 @@ const Wallet = () => {
 
         <TabsContent value="gifts">
           <div>
-            <Card className="border-purple-300 dark:border-purple-800">
+            <Card className="mb-4">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2">
-                  <Gift className="h-5 w-5 text-purple-500" />
-                  <span>Your Gift Cards</span>
+                  <Ticket className="h-5 w-5 text-purple-500" />
+                  <span>Your Flight Reward Cards</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm text-muted-foreground">
-                    Complete tasks to unlock more gift cards
+                    Complete tasks to unlock more reward cards
                   </p>
                   <div className="text-sm text-purple-600 font-medium">
                     {completedTasks} tasks completed
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {mockGiftCards.map((card) => (
+                <div className="space-y-4">
+                  {enhancedGiftCards.map((card) => (
                     <GiftCard 
                       key={card.id} 
                       card={{
@@ -181,6 +214,14 @@ const Wallet = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
+              <h3 className="font-medium mb-2">How to use your rewards</h3>
+              <p className="text-sm text-muted-foreground">
+                Complete eco-friendly tasks to unlock flight reward cards. 
+                Present these at partner locations to redeem your rewards.
+              </p>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
