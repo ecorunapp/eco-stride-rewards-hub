@@ -3,9 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package } from "lucide-react";
+import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { ActiveTask } from "./TaskDetailDialog";
+import { mockGiftCards } from "@/data/mockData";
+import GiftCard from "../wallet/GiftCard";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const TaskTimeline: React.FC = () => {
   const [activeTask, setActiveTask] = useState<ActiveTask | null>(null);
@@ -13,6 +16,17 @@ const TaskTimeline: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [currentStage, setCurrentStage] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState(0);
+  const [selectedCard, setSelectedCard] = useState<typeof mockGiftCards[0] | null>(null);
+  const [isCardDialogOpen, setIsCardDialogOpen] = useState(false);
+  
+  // Load completed tasks count from local storage
+  useEffect(() => {
+    const storedCount = localStorage.getItem("ecoDropCompletedTasks");
+    if (storedCount) {
+      setCompletedTasks(parseInt(storedCount));
+    }
+  }, []);
   
   const stages = [
     { name: "Pick Up", icon: <Package className="h-4 w-4" />, complete: false },
@@ -80,6 +94,27 @@ const TaskTimeline: React.FC = () => {
       const updatedTask = { ...activeTask, status: "completed" };
       localStorage.setItem("ecoDropActiveTask", JSON.stringify(updatedTask));
       
+      // Increment completed tasks count and save to local storage
+      const newCompletedCount = completedTasks + 1;
+      setCompletedTasks(newCompletedCount);
+      localStorage.setItem("ecoDropCompletedTasks", newCompletedCount.toString());
+      
+      // Check if any gift cards are unlocked with this completion
+      const newlyUnlockedCard = mockGiftCards.find(card => 
+        card.requiredCompletions === newCompletedCount && !card.isUnlocked
+      );
+      
+      if (newlyUnlockedCard) {
+        // Update the card's unlocked status
+        newlyUnlockedCard.isUnlocked = true;
+        
+        // Show a success message about unlocking a gift card
+        toast.success(`You've unlocked a ${newlyUnlockedCard.name} Gift Card!`, {
+          description: "Visit your wallet to view your gift cards",
+          icon: <Gift className="h-5 w-5" />
+        });
+      }
+      
       // Show success toast and clear active task
       toast.success(`Task completed! You earned ${activeTask.coins} ecoCoins`, {
         description: `Great job delivering from ${activeTask.storeName}`
@@ -92,93 +127,183 @@ const TaskTimeline: React.FC = () => {
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+
+  const handleOpenCardDialog = (card: typeof mockGiftCards[0]) => {
+    setSelectedCard(card);
+    setIsCardDialogOpen(true);
+  };
   
-  if (!activeTask) return null;
+  if (!activeTask) {
+    // When no active task, show gift card progress if we're in the main page
+    return (
+      <Card className="border-purple-300 dark:border-purple-800 mt-6">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Gift Card Challenges</h3>
+            <div className="text-sm text-purple-600">
+              {completedTasks} tasks completed
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            {mockGiftCards.map((card) => (
+              <GiftCard 
+                key={card.id} 
+                card={{
+                  ...card,
+                  isUnlocked: completedTasks >= card.requiredCompletions
+                }}
+                onClick={() => handleOpenCardDialog({
+                  ...card,
+                  isUnlocked: completedTasks >= card.requiredCompletions
+                })}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
-    <Card className={`border-purple-300 dark:border-purple-800 fixed ${isExpanded ? 'top-4 bottom-20' : 'bottom-20'} left-4 right-4 z-20 shadow-lg transition-all duration-300`}>
-      <CardContent className={`p-3 ${isExpanded ? 'h-full flex flex-col' : ''}`}>
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h3 className="text-sm font-medium">{activeTask.storeName}</h3>
-            <div className="flex items-center text-xs text-slate-500">
-              <MapPin className="h-3 w-3 mr-1" /> {activeTask.distance} km
+    <>
+      <Card className={`border-purple-300 dark:border-purple-800 fixed ${isExpanded ? 'top-4 bottom-20' : 'bottom-20'} left-4 right-4 z-20 shadow-lg transition-all duration-300`}>
+        <CardContent className={`p-3 ${isExpanded ? 'h-full flex flex-col' : ''}`}>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h3 className="text-sm font-medium">{activeTask.storeName}</h3>
+              <div className="flex items-center text-xs text-slate-500">
+                <MapPin className="h-3 w-3 mr-1" /> {activeTask.distance} km
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex items-center text-xs font-medium">
+                <Timer className="h-3 w-3 mr-1 text-purple-500" />
+                <span>{formatTime(elapsedTime)}</span>
+              </div>
+              <div className="text-xs text-purple-500 text-right">
+                {activeTask.estimatedTime}
+              </div>
             </div>
           </div>
           
-          <div>
-            <div className="flex items-center text-xs font-medium">
-              <Timer className="h-3 w-3 mr-1 text-purple-500" />
-              <span>{formatTime(elapsedTime)}</span>
-            </div>
-            <div className="text-xs text-purple-500 text-right">
-              {activeTask.estimatedTime}
-            </div>
-          </div>
-        </div>
-        
-        <Progress value={progress} className="h-2 mb-2 bg-purple-100 dark:bg-purple-900/20">
-          <div 
-            className="h-full bg-purple-500" 
-            style={{ width: `${progress}%` }}
-          />
-        </Progress>
-
-        <div className="flex items-center justify-between mb-2">
-          {stages.map((stage, index) => (
+          <Progress value={progress} className="h-2 mb-2 bg-purple-100 dark:bg-purple-900/20">
             <div 
-              key={index} 
-              className={`flex flex-col items-center ${
-                index === currentStage ? 'text-purple-600' : 
-                index < currentStage ? 'text-green-500' : 'text-gray-400'
-              }`}
-            >
-              <div className={`rounded-full p-1 ${
-                index === currentStage ? 'bg-purple-100 border border-purple-300' : 
-                index < currentStage ? 'bg-green-100' : 'bg-gray-100'
-              }`}>
-                {index < currentStage ? <CheckCircle className="h-4 w-4" /> : stage.icon}
+              className="h-full bg-purple-500" 
+              style={{ width: `${progress}%` }}
+            />
+          </Progress>
+
+          <div className="flex items-center justify-between mb-2">
+            {stages.map((stage, index) => (
+              <div 
+                key={index} 
+                className={`flex flex-col items-center ${
+                  index === currentStage ? 'text-purple-600' : 
+                  index < currentStage ? 'text-green-500' : 'text-gray-400'
+                }`}
+              >
+                <div className={`rounded-full p-1 ${
+                  index === currentStage ? 'bg-purple-100 border border-purple-300' : 
+                  index < currentStage ? 'bg-green-100' : 'bg-gray-100'
+                }`}>
+                  {index < currentStage ? <CheckCircle className="h-4 w-4" /> : stage.icon}
+                </div>
+                <span className="text-[10px] mt-1">{stage.name}</span>
               </div>
-              <span className="text-[10px] mt-1">{stage.name}</span>
-            </div>
-          ))}
-        </div>
-        
-        {isExpanded && (
-          <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-md mb-2 overflow-hidden relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <Navigation className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                <p className="text-sm font-medium">Navigation View</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Follow the route to {activeTask.storeName}
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
-        )}
-        
-        <div className="flex items-center justify-between">
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={toggleExpand} 
-            className="h-7 text-xs"
-          >
-            {isExpanded ? "Hide Map" : "Show Map"}
-          </Button>
           
-          <Button 
-            size="sm" 
-            onClick={handleCompleteTask} 
-            className="h-7 text-xs bg-purple-600 hover:bg-purple-700"
-          >
-            <CircleCheck className="h-3 w-3 mr-1" />
-            Complete Task
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          {isExpanded && (
+            <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-md mb-2 overflow-hidden relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <Navigation className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium">Navigation View</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Follow the route to {activeTask.storeName}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="flex items-center justify-between">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={toggleExpand} 
+              className="h-7 text-xs"
+            >
+              {isExpanded ? "Hide Map" : "Show Map"}
+            </Button>
+            
+            <Button 
+              size="sm" 
+              onClick={handleCompleteTask} 
+              className="h-7 text-xs bg-purple-600 hover:bg-purple-700"
+            >
+              <CircleCheck className="h-3 w-3 mr-1" />
+              Complete Task
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={isCardDialogOpen} onOpenChange={setIsCardDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{selectedCard?.name} Gift Card</DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-4">
+            {selectedCard && (
+              <div className="space-y-4">
+                <img 
+                  src={selectedCard.imageUrl} 
+                  alt={selectedCard.name} 
+                  className="w-full h-48 object-cover rounded-lg" 
+                />
+                
+                <div className="space-y-2">
+                  <p className="text-sm">{selectedCard.description}</p>
+                  
+                  {selectedCard.isUnlocked ? (
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                      <div className="flex items-center">
+                        <Gift className="h-5 w-5 text-green-500 mr-2" />
+                        <span className="font-medium">Unlocked!</span>
+                      </div>
+                      <p className="text-sm mt-1">
+                        This gift card is available in your wallet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
+                      <div className="flex items-center">
+                        <Lock className="h-5 w-5 text-amber-500 mr-2" />
+                        <span className="font-medium">
+                          Complete {selectedCard.requiredCompletions - completedTasks} more tasks to unlock
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => setIsCardDialogOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
