@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Lock, Plane, TicketIcon } from "lucide-react";
+import { Gift, Lock, Plane, TicketIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface GiftCardType {
@@ -13,6 +13,7 @@ export interface GiftCardType {
   requiredCompletions: number;
   backgroundColor: string;
   textColor: string;
+  type?: "flight" | "gift"; // To distinguish between flight tickets and gift cards
   // Flight ticket related fields
   origin?: string; 
   destination?: string;
@@ -22,6 +23,8 @@ export interface GiftCardType {
     seat?: string;
     gate?: string;
   };
+  // Gift card related fields
+  logo?: string;
 }
 
 interface GiftCardProps {
@@ -31,6 +34,76 @@ interface GiftCardProps {
 }
 
 const GiftCard: React.FC<GiftCardProps> = ({ card, className, onClick }) => {
+  // Traditional gift card design
+  if (card.type === "gift") {
+    return (
+      <Card 
+        className={cn(
+          "overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 relative h-48",
+          className
+        )}
+        onClick={onClick}
+        style={{ backgroundColor: card.backgroundColor }}
+      >
+        <CardContent className="p-0 relative h-full">
+          <div className="flex flex-col h-full relative">
+            {/* Gift card content */}
+            <div className="p-6 flex flex-col justify-between h-full">
+              {/* Company name/logo */}
+              <div className="flex justify-between items-start">
+                <div className={cn("text-2xl font-bold", card.textColor)}>
+                  {card.name}
+                </div>
+                <Gift className={cn("h-5 w-5", card.textColor)} />
+              </div>
+              
+              {/* Middle content - depends on the gift card */}
+              <div className="flex-grow my-4">
+                {card.name === "Amazon" && (
+                  <div className={cn("text-3xl font-bold flex items-center", card.textColor)}>
+                    <span>amazon</span>
+                    <div className={cn("text-[#F97316] ml-0.5 text-3xl font-bold")}>
+                      <span style={{ fontSize: "1.5rem" }}>⌢</span>
+                    </div>
+                  </div>
+                )}
+                {card.name === "Noon" && (
+                  <div className={cn("text-5xl font-bold lowercase", card.textColor)}>
+                    noon
+                  </div>
+                )}
+                {card.name === "PayPal" && (
+                  <div className={cn("text-3xl font-bold", card.textColor)}>
+                    <span className="font-black">Pay</span>
+                    <span className="font-light">Pal</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Bottom description */}
+              <div className={cn("text-sm", card.textColor, "opacity-80")}>
+                <div>{card.description}</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Lock overlay for locked cards */}
+          {!card.isUnlocked && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="text-center">
+                <Lock className="h-8 w-8 text-white mx-auto mb-2" />
+                <p className="text-white text-sm">
+                  Complete {card.requiredCompletions} tasks to unlock
+                </p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Flight ticket design (default)
   return (
     <Card 
       className={cn(

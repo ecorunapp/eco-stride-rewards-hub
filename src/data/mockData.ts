@@ -61,6 +61,7 @@ export interface GiftCard {
   requiredCompletions: number;
   backgroundColor: string;
   textColor: string;
+  type: "flight" | "gift";
 }
 
 // Mock user data
@@ -199,7 +200,7 @@ export const mockTransactions: Transaction[] = [
 ];
 
 // Mock gift cards
-export const mockGiftCards: GiftCard[] = [
+export const mockGiftCards = [
   {
     id: "gift-1",
     name: "Starbucks",
@@ -208,7 +209,8 @@ export const mockGiftCards: GiftCard[] = [
     isUnlocked: false,
     requiredCompletions: 1,
     backgroundColor: "#00704A",
-    textColor: "text-white"
+    textColor: "text-white",
+    type: "flight"
   },
   {
     id: "gift-2",
@@ -218,7 +220,8 @@ export const mockGiftCards: GiftCard[] = [
     isUnlocked: false,
     requiredCompletions: 3,
     backgroundColor: "#FF9900",
-    textColor: "text-black"
+    textColor: "text-black",
+    type: "flight"
   },
   {
     id: "gift-3",
@@ -228,7 +231,8 @@ export const mockGiftCards: GiftCard[] = [
     isUnlocked: false,
     requiredCompletions: 5,
     backgroundColor: "#F1F1F1",
-    textColor: "text-black"
+    textColor: "text-black",
+    type: "flight"
   },
   {
     id: "gift-4",
@@ -238,6 +242,44 @@ export const mockGiftCards: GiftCard[] = [
     isUnlocked: false,
     requiredCompletions: 7,
     backgroundColor: "#1DB954",
-    textColor: "text-white"
+    textColor: "text-white",
+    type: "flight"
+  }
+];
+
+// Gift card designs (traditional style)
+export const mockGiftCardDesigns = [
+  {
+    id: "giftcard-1",
+    name: "Amazon",
+    description: "$25 Amazon Gift Card",
+    imageUrl: "",
+    isUnlocked: false,
+    requiredCompletions: 5,
+    backgroundColor: "#222",
+    textColor: "text-white",
+    type: "gift"
+  },
+  {
+    id: "giftcard-2",
+    name: "Noon",
+    description: "AED 50 Noon Gift Card",
+    imageUrl: "",
+    isUnlocked: false,
+    requiredCompletions: 3,
+    backgroundColor: "#FEF7CD",
+    textColor: "text-black",
+    type: "gift"
+  },
+  {
+    id: "giftcard-3",
+    name: "PayPal",
+    description: "$10 PayPal Credit",
+    imageUrl: "",
+    isUnlocked: false,
+    requiredCompletions: 4,
+    backgroundColor: "#0EA5E9",
+    textColor: "text-white",
+    type: "gift"
   }
 ];

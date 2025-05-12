@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import EcoTabCard from "@/components/wallet/EcoTabCard";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
-import { mockUser, mockTransactions, mockGiftCards } from "@/data/mockData";
+import { mockUser, mockTransactions, mockGiftCards, mockGiftCardDesigns } from "@/data/mockData";
 import { format } from "date-fns";
 import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
 import GiftCard from "@/components/wallet/GiftCard";
@@ -56,8 +55,8 @@ const Wallet = () => {
     setIsCardActivated(true);
   };
 
-  // Enhanced gift cards with flight ticket data
-  const enhancedGiftCards = mockGiftCards.map(card => {
+  // Enhanced flight rewards with flight ticket data
+  const enhancedFlightRewards = mockGiftCards.map(card => {
     const destinations = {
       "Starbucks": { origin: "DXB", destination: "PAR", color: "#FF719A", date: "12 Jun 2024" },
       "Amazon": { origin: "JFK", destination: "LHR", color: "#6E59A5", date: "18 Jun 2024" },
@@ -86,6 +85,12 @@ const Wallet = () => {
     };
   });
 
+  // Update isUnlocked status based on completedTasks
+  const updatedGiftCards = mockGiftCardDesigns.map(card => ({
+    ...card,
+    isUnlocked: completedTasks >= card.requiredCompletions
+  }));
+
   return (
     <div className="space-y-6 pb-20">
       <div>
@@ -103,9 +108,9 @@ const Wallet = () => {
             <WalletIcon className="h-4 w-4 mr-2" />
             EcoTab Card
           </TabsTrigger>
-          <TabsTrigger value="gifts">
-            <Ticket className="h-4 w-4 mr-2" />
-            Flight Rewards
+          <TabsTrigger value="rewards">
+            <Gift className="h-4 w-4 mr-2" />
+            Rewards
           </TabsTrigger>
         </TabsList>
 
@@ -188,13 +193,43 @@ const Wallet = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="gifts">
+        <TabsContent value="rewards">
           <div>
+            {/* Gift Cards Section */}
+            <Card className="mb-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center space-x-2">
+                  <Gift className="h-5 w-5 text-orange-500" />
+                  <span>Gift Cards</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-muted-foreground">
+                    Complete eco-friendly tasks to unlock gift cards
+                  </p>
+                  <div className="text-sm text-purple-600 font-medium">
+                    {completedTasks} tasks completed
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {updatedGiftCards.map((card) => (
+                    <GiftCard 
+                      key={card.id} 
+                      card={card}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Flight Rewards Section */}
             <Card className="mb-4">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2">
                   <Ticket className="h-5 w-5 text-purple-500" />
-                  <span>Your Flight Rewards</span>
+                  <span>Flight Rewards</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -208,7 +243,7 @@ const Wallet = () => {
                 </div>
 
                 <div className="grid gap-4">
-                  {enhancedGiftCards.map((card) => (
+                  {enhancedFlightRewards.map((card) => (
                     <GiftCard 
                       key={card.id} 
                       card={{
@@ -222,9 +257,9 @@ const Wallet = () => {
             </Card>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
-              <h3 className="font-medium mb-2">How to redeem your flight rewards</h3>
+              <h3 className="font-medium mb-2">How to redeem your rewards</h3>
               <p className="text-sm text-muted-foreground">
-                Complete eco-friendly tasks to unlock flight reward tickets. 
+                Complete eco-friendly tasks to unlock gift cards and flight rewards. 
                 Present these digital tickets at partner locations or scan the QR code at kiosks to claim your rewards.
               </p>
             </div>
