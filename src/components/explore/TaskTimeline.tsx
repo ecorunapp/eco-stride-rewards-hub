@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package, Gift } from "lucide-react";
+import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package, Gift, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ActiveTask } from "./TaskDetailDialog";
 import { mockGiftCards } from "@/data/mockData";

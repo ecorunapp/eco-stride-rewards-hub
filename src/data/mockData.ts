@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   name: string;
@@ -51,6 +50,17 @@ export interface Transaction {
   description: string;
   date: Date;
   storeId?: string;
+}
+
+export interface GiftCard {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  isUnlocked: boolean;
+  requiredCompletions: number;
+  backgroundColor: string;
+  textColor: string;
 }
 
 // Mock user data
@@ -186,4 +196,48 @@ export const mockTransactions: Transaction[] = [
     date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     storeId: "store-1",
   },
+];
+
+// Mock gift cards
+export const mockGiftCards: GiftCard[] = [
+  {
+    id: "gift-1",
+    name: "Starbucks",
+    description: "10% off any purchase at Starbucks",
+    imageUrl: "https://images.unsplash.com/photo-1507226983735-a838615193b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    isUnlocked: false,
+    requiredCompletions: 1,
+    backgroundColor: "#00704A",
+    textColor: "text-white"
+  },
+  {
+    id: "gift-2",
+    name: "Amazon",
+    description: "5$ gift card for Amazon",
+    imageUrl: "https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    isUnlocked: false,
+    requiredCompletions: 3,
+    backgroundColor: "#FF9900",
+    textColor: "text-black"
+  },
+  {
+    id: "gift-3",
+    name: "Nike",
+    description: "15% off on your next purchase",
+    imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    isUnlocked: false,
+    requiredCompletions: 5,
+    backgroundColor: "#F1F1F1",
+    textColor: "text-black"
+  },
+  {
+    id: "gift-4",
+    name: "Spotify",
+    description: "1 month premium subscription",
+    imageUrl: "https://images.unsplash.com/photo-1614680376739-414d95ff43df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    isUnlocked: false,
+    requiredCompletions: 7,
+    backgroundColor: "#1DB954",
+    textColor: "text-white"
+  }
 ];
