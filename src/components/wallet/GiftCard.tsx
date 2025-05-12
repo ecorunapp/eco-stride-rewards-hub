@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Lock, Plane } from "lucide-react";
+import { Lock, Plane, TicketIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface GiftCardType {
@@ -13,7 +13,7 @@ export interface GiftCardType {
   requiredCompletions: number;
   backgroundColor: string;
   textColor: string;
-  // New flight ticket related fields
+  // Flight ticket related fields
   origin?: string; 
   destination?: string;
   date?: string;
@@ -44,6 +44,11 @@ const GiftCard: React.FC<GiftCardProps> = ({ card, className, onClick }) => {
         <div className="flex flex-col h-full relative">
           {/* Main ticket content */}
           <div className="p-4 relative">
+            {/* Ticket icon */}
+            <div className="absolute right-3 top-3">
+              <TicketIcon className={cn("h-5 w-5", card.textColor)} />
+            </div>
+            
             {/* Airport codes and flight info */}
             <div className="flex justify-between items-center mb-3">
               <div className={cn("text-xl font-bold", card.textColor)}>
@@ -64,19 +69,17 @@ const GiftCard: React.FC<GiftCardProps> = ({ card, className, onClick }) => {
             {/* Origin/Destination details */}
             <div className="flex justify-between mb-4">
               <div className={cn("text-xs", card.textColor, "opacity-80")}>
-                <div className="flex items-center">
-                  <span className="h-2 w-2 rounded-full bg-current mr-1"></span>
+                <div>
                   {card.origin ? `${card.origin}` : card.name}
                 </div>
               </div>
               
               <div className={cn("text-xs text-center", card.textColor, "opacity-80")}>
-                {card.date || "Gift Card"}
+                {card.date || "Flight Reward"}
               </div>
               
               <div className={cn("text-xs text-right", card.textColor, "opacity-80")}>
-                <div className="flex items-center justify-end">
-                  <span className="h-2 w-2 rounded-full bg-current mr-1"></span>
+                <div>
                   {card.destination ? `${card.destination}` : card.description}
                 </div>
               </div>
@@ -84,34 +87,32 @@ const GiftCard: React.FC<GiftCardProps> = ({ card, className, onClick }) => {
           </div>
           
           {/* Bottom details section with the ticket "cut" */}
-          {card.details && (
-            <div 
-              className={cn(
-                "mt-1 p-3 relative", 
-                card.backgroundColor === "#F2FCE2" ? "bg-green-100" : 
-                card.backgroundColor === "#FEF7CD" ? "bg-yellow-100" : 
-                card.backgroundColor === "#E5DEFF" ? "bg-purple-100" :
-                "bg-opacity-20 bg-black"
-              )}
-            >
-              {/* Ticket cuts */}
-              <div className="absolute -top-2 left-0 h-4 w-4 rounded-full bg-white translate-x(-50%)"></div>
-              <div className="absolute -top-2 right-0 h-4 w-4 rounded-full bg-white translate-x(50%)"></div>
-              
-              {/* Details info */}
-              <div className="flex justify-between items-center">
-                <div className={cn("text-xs", card.textColor)}>
-                  <p className="font-semibold">Terminal: {card.details.terminal || "C1"}</p>
-                </div>
-                <div className={cn("text-xs", card.textColor)}>
-                  <p className="font-semibold">Seat: {card.details.seat || "B12"}</p>
-                </div>
-                <div className={cn("text-xs", card.textColor)}>
-                  <p className="font-semibold">Gate: {card.details.gate || "A"}</p>
-                </div>
+          <div 
+            className={cn(
+              "mt-1 p-3 relative border-t border-dashed", 
+              card.backgroundColor === "#F2FCE2" ? "bg-green-100" : 
+              card.backgroundColor === "#FEF7CD" ? "bg-yellow-100" : 
+              card.backgroundColor === "#E5DEFF" ? "bg-purple-100" :
+              "bg-opacity-20 bg-black"
+            )}
+          >
+            {/* Ticket cuts */}
+            <div className="absolute -top-2 left-0 h-4 w-4 rounded-full bg-white -translate-x-1/2"></div>
+            <div className="absolute -top-2 right-0 h-4 w-4 rounded-full bg-white translate-x-1/2"></div>
+            
+            {/* Details info */}
+            <div className="flex justify-between items-center">
+              <div className={cn("text-xs", card.textColor)}>
+                <p className="font-semibold">Terminal: {card.details?.terminal || "C1"}</p>
+              </div>
+              <div className={cn("text-xs", card.textColor)}>
+                <p className="font-semibold">Seat: {card.details?.seat || "B12"}</p>
+              </div>
+              <div className={cn("text-xs", card.textColor)}>
+                <p className="font-semibold">Gate: {card.details?.gate || "A"}</p>
               </div>
             </div>
-          )}
+          </div>
           
           {/* Lock overlay for locked cards */}
           {!card.isUnlocked && (

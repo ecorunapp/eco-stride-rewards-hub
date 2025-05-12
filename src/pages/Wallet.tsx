@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,24 +59,29 @@ const Wallet = () => {
   // Enhanced gift cards with flight ticket data
   const enhancedGiftCards = mockGiftCards.map(card => {
     const destinations = {
-      "Starbucks": { origin: "MSQ", destination: "GVA", color: "#FF719A" },
-      "Amazon": { origin: "JDP", destination: "DXB", color: "#6E59A5" },
-      "Nike": { origin: "NYC", destination: "SFO", color: "#FEF7CD" },
-      "Spotify": { origin: "LAX", destination: "LDN", color: "#9b87f5" }
+      "Starbucks": { origin: "DXB", destination: "PAR", color: "#FF719A", date: "12 Jun 2024" },
+      "Amazon": { origin: "JFK", destination: "LHR", color: "#6E59A5", date: "18 Jun 2024" },
+      "Nike": { origin: "SFO", destination: "TYO", color: "#FEF7CD", date: "24 Jul 2024" },
+      "Spotify": { origin: "LAX", destination: "SYD", color: "#9b87f5", date: "02 Aug 2024" }
     };
     
-    const cardInfo = destinations[card.name] || { origin: card.name.substring(0, 3).toUpperCase(), destination: "ECO", color: card.backgroundColor };
+    const cardInfo = destinations[card.name] || { 
+      origin: card.name.substring(0, 3).toUpperCase(), 
+      destination: "ECO", 
+      color: card.backgroundColor,
+      date: "16 Jun 2024"
+    };
     
     return {
       ...card,
       backgroundColor: cardInfo.color || card.backgroundColor,
       origin: cardInfo.origin,
       destination: cardInfo.destination,
-      date: "16 June 2024",
+      date: cardInfo.date,
       details: {
-        terminal: "C1",
-        seat: "B12",
-        gate: "A"
+        terminal: "T" + Math.floor(Math.random() * 5 + 1),
+        seat: String.fromCharCode(65 + Math.floor(Math.random() * 6)) + Math.floor(Math.random() * 30 + 1),
+        gate: String.fromCharCode(65 + Math.floor(Math.random() * 12)) + Math.floor(Math.random() * 10)
       }
     };
   });
@@ -99,7 +105,7 @@ const Wallet = () => {
           </TabsTrigger>
           <TabsTrigger value="gifts">
             <Ticket className="h-4 w-4 mr-2" />
-            Gift Cards
+            Flight Rewards
           </TabsTrigger>
         </TabsList>
 
@@ -188,20 +194,20 @@ const Wallet = () => {
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2">
                   <Ticket className="h-5 w-5 text-purple-500" />
-                  <span>Your Flight Reward Cards</span>
+                  <span>Your Flight Rewards</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm text-muted-foreground">
-                    Complete tasks to unlock more reward cards
+                    Complete eco-friendly tasks to unlock flight rewards
                   </p>
                   <div className="text-sm text-purple-600 font-medium">
                     {completedTasks} tasks completed
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid gap-4">
                   {enhancedGiftCards.map((card) => (
                     <GiftCard 
                       key={card.id} 
@@ -216,10 +222,10 @@ const Wallet = () => {
             </Card>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
-              <h3 className="font-medium mb-2">How to use your rewards</h3>
+              <h3 className="font-medium mb-2">How to redeem your flight rewards</h3>
               <p className="text-sm text-muted-foreground">
-                Complete eco-friendly tasks to unlock flight reward cards. 
-                Present these at partner locations to redeem your rewards.
+                Complete eco-friendly tasks to unlock flight reward tickets. 
+                Present these digital tickets at partner locations or scan the QR code at kiosks to claim your rewards.
               </p>
             </div>
           </div>
