@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import { mockUser, mockTransactions, mockGiftCards, mockGiftCardDesigns } from "@/data/mockData";
 import { format } from "date-fns";
 import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
-import GiftCard from "@/components/wallet/GiftCard";
+import GiftCard, { GiftCardType } from "@/components/wallet/GiftCard";
 import { Gift, Wallet as WalletIcon, Ticket } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -81,14 +82,16 @@ const Wallet = () => {
         terminal: "T" + Math.floor(Math.random() * 5 + 1),
         seat: String.fromCharCode(65 + Math.floor(Math.random() * 6)) + Math.floor(Math.random() * 30 + 1),
         gate: String.fromCharCode(65 + Math.floor(Math.random() * 12)) + Math.floor(Math.random() * 10)
-      }
+      },
+      type: "flight" as const // Explicitly set as "flight" type
     };
   });
 
   // Update isUnlocked status based on completedTasks
   const updatedGiftCards = mockGiftCardDesigns.map(card => ({
     ...card,
-    isUnlocked: completedTasks >= card.requiredCompletions
+    isUnlocked: completedTasks >= card.requiredCompletions,
+    type: "gift" as const // Explicitly set as "gift" type
   }));
 
   return (
@@ -217,7 +220,7 @@ const Wallet = () => {
                   {updatedGiftCards.map((card) => (
                     <GiftCard 
                       key={card.id} 
-                      card={card}
+                      card={card as GiftCardType}
                     />
                   ))}
                 </div>
@@ -248,7 +251,8 @@ const Wallet = () => {
                       key={card.id} 
                       card={{
                         ...card,
-                        isUnlocked: completedTasks >= card.requiredCompletions
+                        isUnlocked: completedTasks >= card.requiredCompletions,
+                        type: "flight" as const // Explicitly set as "flight" type
                       }}
                     />
                   ))}

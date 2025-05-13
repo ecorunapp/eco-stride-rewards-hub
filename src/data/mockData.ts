@@ -210,7 +210,7 @@ export const mockGiftCards = [
     requiredCompletions: 1,
     backgroundColor: "#00704A",
     textColor: "text-white",
-    type: "flight"
+    type: "flight" as const  // Explicitly typed as flight
   },
   {
     id: "gift-2",
@@ -221,7 +221,7 @@ export const mockGiftCards = [
     requiredCompletions: 3,
     backgroundColor: "#FF9900",
     textColor: "text-black",
-    type: "flight"
+    type: "flight" as const  // Explicitly typed as flight
   },
   {
     id: "gift-3",
@@ -232,7 +232,7 @@ export const mockGiftCards = [
     requiredCompletions: 5,
     backgroundColor: "#F1F1F1",
     textColor: "text-black",
-    type: "flight"
+    type: "flight" as const  // Explicitly typed as flight
   },
   {
     id: "gift-4",
@@ -243,7 +243,7 @@ export const mockGiftCards = [
     requiredCompletions: 7,
     backgroundColor: "#1DB954",
     textColor: "text-white",
-    type: "flight"
+    type: "flight" as const  // Explicitly typed as flight
   }
 ];
 
@@ -258,7 +258,7 @@ export const mockGiftCardDesigns = [
     requiredCompletions: 5,
     backgroundColor: "#222",
     textColor: "text-white",
-    type: "gift"
+    type: "gift" as const  // Explicitly typed as gift
   },
   {
     id: "giftcard-2",
@@ -269,7 +269,7 @@ export const mockGiftCardDesigns = [
     requiredCompletions: 3,
     backgroundColor: "#FEF7CD",
     textColor: "text-black",
-    type: "gift"
+    type: "gift" as const  // Explicitly typed as gift
   },
   {
     id: "giftcard-3",
@@ -280,6 +280,6 @@ export const mockGiftCardDesigns = [
     requiredCompletions: 4,
     backgroundColor: "#0EA5E9",
     textColor: "text-white",
-    type: "gift"
+    type: "gift" as const  // Explicitly typed as gift
   }
 ];
