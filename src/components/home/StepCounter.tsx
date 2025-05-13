@@ -15,10 +15,17 @@ const StepCounter: React.FC<StepCounterProps> = ({ steps, goal, className }) => 
 
   // Animate step count when it changes
   useEffect(() => {
+    // If steps are 0 or less than 5, just set them directly without animation
+    if (steps <= 5) {
+      setAnimatedSteps(steps);
+      return;
+    }
+    
     const duration = 1000; // animation duration in ms
     const interval = 20; // update interval in ms
-    const increment = Math.max(1, Math.ceil(steps / (duration / interval)));
-    let current = 0;
+    const difference = steps - animatedSteps;
+    const increment = Math.max(1, Math.ceil(difference / (duration / interval)));
+    let current = animatedSteps;
 
     const timer = setInterval(() => {
       current += increment;

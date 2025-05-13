@@ -1,10 +1,11 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Timer, Leaf, Coins } from "lucide-react";
+import { Timer, Leaf, Coins, RefreshCw, Smartphone } from "lucide-react";
 import StepCounter from "@/components/home/StepCounter";
 import { cn } from "@/lib/utils";
+import { stepDetectionService } from "@/services/StepDetectionService";
 
 interface StepTrackerDialogProps {
   isOpen: boolean;
@@ -27,6 +28,34 @@ const StepTrackerDialog: React.FC<StepTrackerDialogProps> = ({
 }) => {
   // Calculate CO2 savings - approximately 0.2kg per 1000 steps
   const co2Saved = (steps / 1000) * 0.2;
+  const [usingRealSensors, setUsingRealSensors] = useState<boolean | null>(null);
+  
+  // Check if device supports motion sensors
+  useEffect(() => {
+    if (isOpen && isWalking) {
+      // Try to start the real sensor
+      const result = stepDetectionService.startListening();
+      
+      // If sensor permission is denied or not available, fall back to simulation
+      if (!result) {
+        stepDetectionService.startSimulation();
+        setUsingRealSensors(false);
+      } else {
+        setUsingRealSensors(true);
+      }
+    }
+    
+    return () => {
+      if (isWalking) {
+        stepDetectionService.stopListening();
+      }
+    };
+  }, [isOpen, isWalking]);
+  
+  // Handle resetting steps
+  const handleResetSteps = () => {
+    stepDetectionService.resetSteps();
+  };
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -83,7 +112,29 @@ const StepTrackerDialog: React.FC<StepTrackerDialogProps> = ({
             )}
           </div>
           
-          <div className="text-xs text-muted-foreground text-center mt-2">
+          {isWalking && (
+            <Button
+              onClick={handleResetSteps}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              <RefreshCw className="h-3 w-3 mr-2" /> Reset Steps
+            </Button>
+          )}
+          
+          <div className="text-xs text-muted-foreground text-center mt-2 flex items-center justify-center">
+            {usingRealSensors !== null && (
+              <>
+                <Smartphone className="inline h-3 w-3 mr-1" />
+                {usingRealSensors 
+                  ? "Using device motion sensors" 
+                  : "Using simulated step counting"}
+              </>
+            )}
+          </div>
+          
+          <div className="text-xs text-muted-foreground text-center">
             <Timer className="inline h-3 w-3 mr-1" />
             Keep tracking to earn more ecoCoins
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,10 +10,11 @@ import { toast } from "sonner";
 import StepTrackerDialog from "@/components/home/StepTrackerDialog";
 import EcoDropTasksDialog from "@/components/explore/EcoDropTasksDialog";
 import TaskTimeline from "@/components/explore/TaskTimeline";
+import { stepDetectionService } from "@/services/StepDetectionService";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [steps, setSteps] = useState(mockUser.totalSteps);
+  const [steps, setSteps] = useState(0); // Start from 0 instead of mockUser.totalSteps
   const [ecoCoins, setEcoCoins] = useState(mockUser.ecoCoins);
   const [isWalking, setIsWalking] = useState(false);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
@@ -23,32 +23,49 @@ const Index = () => {
   const goal = mockUser.dailyGoal;
   const goalCompletion = Math.min((steps / goal) * 100, 100);
   
-  // This simulates a step counter
+  // Listen to step changes from our service
   useEffect(() => {
-    let interval: number | null = null;
-    
-    if (isWalking) {
-      interval = window.setInterval(() => {
-        setSteps(prevSteps => {
-          const newSteps = prevSteps + Math.floor(Math.random() * 5) + 1;
-          
-          // For every 100 steps, earn 1 ecoCoin
-          if (Math.floor(newSteps / 100) > Math.floor(prevSteps / 100)) {
-            const newCoins = Math.floor(newSteps / 100) - Math.floor(prevSteps / 100);
-            setEcoCoins(prevCoins => prevCoins + newCoins);
-            toast(`Earned ${newCoins} ecoCoins!`, {
-              icon: <Coins size={18} className="text-coin" />,
-            });
-          }
-          
-          return newSteps;
+    const handleStepUpdate = (newSteps: number) => {
+      setSteps(newSteps);
+      
+      // For every 100 steps, earn 1 ecoCoin
+      if (Math.floor(newSteps / 100) > Math.floor((newSteps - 1) / 100)) {
+        const newCoins = 1;
+        setEcoCoins(prevCoins => prevCoins + newCoins);
+        toast(`Earned ${newCoins} ecoCoins!`, {
+          icon: <Coins size={18} className="text-coin" />,
         });
-      }, 1000);
-    }
-    
-    return () => {
-      if (interval) window.clearInterval(interval);
+      }
     };
+    
+    // Add the listener
+    stepDetectionService.addStepListener(handleStepUpdate);
+    
+    // Clean up
+    return () => {
+      stepDetectionService.removeStepListener(handleStepUpdate);
+    };
+  }, []);
+  
+  // Start or stop step tracking based on isWalking state
+  useEffect(() => {
+    if (isWalking) {
+      try {
+        // Try to use real sensors first
+        const result = stepDetectionService.startListening();
+        
+        // Fall back to simulation if needed
+        if (!result) {
+          stepDetectionService.startSimulation();
+        }
+      } catch (error) {
+        console.error("Error starting step detection:", error);
+        // Fall back to simulation
+        stepDetectionService.startSimulation();
+      }
+    } else {
+      stepDetectionService.stopListening();
+    }
   }, [isWalking]);
 
   // Check if there's an active task
