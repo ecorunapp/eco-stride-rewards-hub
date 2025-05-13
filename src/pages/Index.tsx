@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ const Index = () => {
   const [isWalking, setIsWalking] = useState(false);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const [isTasksDialogOpen, setIsTasksDialogOpen] = useState(false);
+  const [hasActiveTask, setHasActiveTask] = useState(false);
   const goal = mockUser.dailyGoal;
   const goalCompletion = Math.min((steps / goal) * 100, 100);
   
@@ -49,6 +51,21 @@ const Index = () => {
     };
   }, [isWalking]);
 
+  // Check if there's an active task
+  useEffect(() => {
+    const storedTask = localStorage.getItem("ecoDropActiveTask");
+    if (storedTask) {
+      const parsedTask = JSON.parse(storedTask);
+      if (parsedTask.status === "in-progress") {
+        setHasActiveTask(true);
+      } else {
+        setHasActiveTask(false);
+      }
+    } else {
+      setHasActiveTask(false);
+    }
+  }, []);
+
   const handleStartStop = () => {
     setIsWalking(!isWalking);
     if (!isWalking && !isTrackerOpen) {
@@ -63,6 +80,15 @@ const Index = () => {
 
   const handleCloseTasksDialog = () => {
     setIsTasksDialogOpen(false);
+    
+    // Check if a task was started after dialog closes
+    const storedTask = localStorage.getItem("ecoDropActiveTask");
+    if (storedTask) {
+      const parsedTask = JSON.parse(storedTask);
+      if (parsedTask.status === "in-progress") {
+        setHasActiveTask(true);
+      }
+    }
   };
 
   const coinsToday = Math.floor(steps / 100);

@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { MapPin, Timer, CircleCheck, Navigation, CheckCircle, Package, Gift, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ActiveTask } from "./TaskDetailDialog";
+import TaskNavigationView from "./TaskNavigationView";
 
 const TaskTimeline: React.FC = () => {
   const [activeTask, setActiveTask] = useState<ActiveTask | null>(null);
@@ -186,15 +187,11 @@ const TaskTimeline: React.FC = () => {
         
         {isExpanded && (
           <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-md mb-2 overflow-hidden relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <Navigation className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                <p className="text-sm font-medium">Navigation View</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Follow the route to {activeTask.storeName}
-                </p>
-              </div>
-            </div>
+            <TaskNavigationView 
+              destination={activeTask.storeName}
+              distance={activeTask.distance}
+              expanded={true}
+            />
           </div>
         )}
         
