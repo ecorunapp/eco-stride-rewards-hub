@@ -11,6 +11,9 @@ import History from "./pages/History";
 import Profile from "./pages/Profile";
 import Meet from "./pages/Meet";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -19,17 +22,21 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<Index />} />
-              <Route path="wallet" element={<Wallet />} />
-              <Route path="explore" element={<Explore />} />
-              <Route path="history" element={<History />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="meet" element={<Meet />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<AppLayout />}>
+                <Route index element={<Index />} />
+                <Route path="wallet" element={<Wallet />} />
+                <Route path="explore" element={<Explore />} />
+                <Route path="history" element={<History />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="meet" element={<Meet />} />
+                <Route path="dashboard" element={<Dashboard />} />
+              </Route>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

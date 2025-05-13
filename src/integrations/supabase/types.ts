@@ -9,7 +9,119 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          task_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          task_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string | null
+          deadline: string
+          description: string
+          distance_km: number | null
+          dropoff_location: string
+          id: string
+          owner_id: string
+          payment_amount: number
+          pickup_location: string
+          runner_id: string | null
+          status: string
+          task_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deadline: string
+          description: string
+          distance_km?: number | null
+          dropoff_location: string
+          id?: string
+          owner_id: string
+          payment_amount: number
+          pickup_location: string
+          runner_id?: string | null
+          status?: string
+          task_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deadline?: string
+          description?: string
+          distance_km?: number | null
+          dropoff_location?: string
+          id?: string
+          owner_id?: string
+          payment_amount?: number
+          pickup_location?: string
+          runner_id?: string | null
+          status?: string
+          task_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_runner_id_fkey"
+            columns: ["runner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

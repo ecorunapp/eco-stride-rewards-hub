@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Wallet, Package, Award, Coins } from "lucide-react";
+import { Activity, Wallet, Package, Award, Coins, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EcoCoinsBalance from "@/components/common/EcoCoinsBalance";
 import { mockUser } from "@/data/mockData";
@@ -11,10 +11,12 @@ import StepTrackerDialog from "@/components/home/StepTrackerDialog";
 import EcoDropTasksDialog from "@/components/explore/EcoDropTasksDialog";
 import TaskTimeline from "@/components/explore/TaskTimeline";
 import { stepDetectionService } from "@/services/StepDetectionService";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [steps, setSteps] = useState(0); // Start from 0 instead of mockUser.totalSteps
+  const { user } = useAuth();
+  const [steps, setSteps] = useState(0);
   const [ecoCoins, setEcoCoins] = useState(mockUser.ecoCoins);
   const [isWalking, setIsWalking] = useState(false);
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
@@ -136,6 +138,14 @@ const Index = () => {
     setIsTasksDialogOpen(true);
   };
 
+  const handleDashboardClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Summary Bar */}
@@ -143,7 +153,7 @@ const Index = () => {
         <div className="flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h1 className="text-lg font-bold">Welcome, {mockUser.name.split(" ")[0]}!</h1>
+              <h1 className="text-lg font-bold">Welcome, {user ? user.email?.split("@")[0] : mockUser.name.split(" ")[0]}!</h1>
               <p className="text-xs text-muted-foreground">Let's get moving today</p>
             </div>
             <EcoCoinsBalance balance={ecoCoins} size="md" />
@@ -251,31 +261,31 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Runfluence+ */}
+        {/* TaskDash */}
         <Card 
-          className="cursor-pointer hover:shadow-md transition-all border-indigo-200/50 dark:border-indigo-900/30 overflow-hidden"
-          onClick={handleRunfluenceClick}
+          className="cursor-pointer hover:shadow-md transition-all border-green-200/50 dark:border-green-900/30 overflow-hidden"
+          onClick={handleDashboardClick}
         >
           <CardContent className="p-0">
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 flex items-center justify-center">
-              <div className="bg-indigo-500 rounded-full p-3">
-                <Award className="text-white h-6 w-6" />
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 flex items-center justify-center">
+              <div className="bg-green-500 rounded-full p-3">
+                <ClipboardList className="text-white h-6 w-6" />
               </div>
             </div>
             <div className="p-4 text-center">
-              <h3 className="font-semibold">Runfluence+</h3>
-              <p className="text-xs text-muted-foreground mt-1">Creator platform & challenges</p>
+              <h3 className="font-semibold">TaskDash</h3>
+              <p className="text-xs text-muted-foreground mt-1">Manage your tasks</p>
               <div className="mt-3 flex justify-center">
                 <Button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRunfluenceClick();
+                    handleDashboardClick();
                   }}
                   variant="outline" 
-                  className="border-indigo-300 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs"
+                  className="border-green-300 dark:border-green-800 text-green-700 dark:text-green-300 text-xs"
                   size="sm"
                 >
-                  View Platform
+                  {user ? "View Dashboard" : "Sign In"}
                 </Button>
               </div>
             </div>
