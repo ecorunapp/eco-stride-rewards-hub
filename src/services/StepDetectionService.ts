@@ -21,10 +21,11 @@ export class StepDetectionService {
   public startListening(): boolean {
     if (this.isListening) return true;
     
-    if (typeof DeviceMotionEvent !== 'undefined' && 
-        typeof DeviceMotionEvent.requestPermission === 'function') {
+    if (typeof window !== 'undefined' && 
+        typeof window.DeviceMotionEvent !== 'undefined' && 
+        typeof window.DeviceMotionEvent.requestPermission === 'function') {
       // iOS 13+ requires permission
-      DeviceMotionEvent.requestPermission()
+      window.DeviceMotionEvent.requestPermission()
         .then(response => {
           if (response === 'granted') {
             this.addListener();
