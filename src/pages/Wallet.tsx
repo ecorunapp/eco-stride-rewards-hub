@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { mockUser, mockTransactions, mockGiftCards, mockGiftCardDesigns } from "
 import { format } from "date-fns";
 import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
 import GiftCard, { GiftCardType } from "@/components/wallet/GiftCard";
-import { Gift, Wallet as WalletIcon, Ticket } from "lucide-react";
+import { Gift, Wallet as WalletIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CardActivationFlow from "@/components/wallet/CardActivationFlow";
 
@@ -291,44 +290,11 @@ const Wallet = () => {
               </CardContent>
             </Card>
 
-            {/* Flight Rewards Section */}
-            <Card className="mb-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2">
-                  <Ticket className="h-5 w-5 text-purple-500" />
-                  <span>Flight Rewards</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm text-muted-foreground">
-                    Complete eco-friendly tasks to unlock flight rewards
-                  </p>
-                  <div className="text-sm text-purple-600 font-medium">
-                    {completedTasks} tasks completed
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  {enhancedFlightRewards.map((card) => (
-                    <GiftCard 
-                      key={card.id} 
-                      card={{
-                        ...card,
-                        isUnlocked: completedTasks >= card.requiredCompletions,
-                        type: "flight" as const // Explicitly set as "flight" type
-                      }}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
             <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
               <h3 className="font-medium mb-2">How to redeem your rewards</h3>
               <p className="text-sm text-muted-foreground">
-                Complete eco-friendly tasks to unlock gift cards and flight rewards. 
-                Present these digital tickets at partner locations or scan the QR code at kiosks to claim your rewards.
+                Complete eco-friendly tasks to unlock gift cards. 
+                Present these digital cards at partner locations or scan the QR code at kiosks to claim your rewards.
               </p>
             </div>
           </div>
