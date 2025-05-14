@@ -1,12 +1,17 @@
 
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import CardDesignCarousel from "./CardDesignCarousel";
-import EcoTabCard from "./EcoTabCard";
-import { ArrowRight, CreditCard, Package } from "lucide-react";
+import { X } from "lucide-react";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface CardDesign {
   id: string;
@@ -17,130 +22,107 @@ interface CardDesign {
 }
 
 interface CardActivationFlowProps {
-  userName: string;
-  onComplete: (selectedCard: CardDesign) => void;
   isOpen: boolean;
   onClose: () => void;
+  userName: string;
+  onComplete: (cardDesign: CardDesign) => void;
 }
 
-const CardActivationFlow: React.FC<CardActivationFlowProps> = ({ 
-  userName, 
-  onComplete,
+const CardActivationFlow: React.FC<CardActivationFlowProps> = ({
   isOpen,
-  onClose
+  onClose,
+  userName,
+  onComplete,
 }) => {
   const [step, setStep] = useState(1);
   const [selectedCard, setSelectedCard] = useState<CardDesign | null>(null);
-  const [cardInEnvelope, setCardInEnvelope] = useState(false);
-  
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handleSelectCard = (card: CardDesign) => {
     setSelectedCard(card);
     setStep(2);
   };
-  
-  const handleActivate = () => {
-    toast.success("Card successfully activated!");
-    if (selectedCard) {
-      onComplete(selectedCard);
+
+  const handleActivateCard = () => {
+    if (!selectedCard) {
+      toast.error("Please select a card design first");
+      return;
     }
+
+    setIsProcessing(true);
+
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      onComplete(selectedCard);
+      toast.success("Your EcoTab Card is now active!");
+      onClose();
+      // Reset state for next time
+      setStep(1);
+      setSelectedCard(null);
+    }, 1500);
+  };
+
+  const handleClose = () => {
+    // Reset state when closing
+    setStep(1);
+    setSelectedCard(null);
     onClose();
   };
 
-  const handleNextStep = () => {
-    if (step < 3) {
-      setStep(step + 1);
-      if (step === 2) {
-        setCardInEnvelope(true);
-      }
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center text-xl">
-            {step === 1 && "Choose a Card Design"}
-            {step === 2 && "Activate Your EcoTab Card"}
-            {step === 3 && "Complete Activation"}
-          </DialogTitle>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="max-w-lg p-0 h-[85vh] max-h-[700px] flex flex-col overflow-hidden">
+        <DialogHeader className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl">
+              {step === 1 ? "Choose Your Card Design" : "Activate Your Card"}
+            </DialogTitle>
+            <DialogClose asChild>
+              <Button variant="ghost" size="icon" onClick={handleClose}>
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DialogClose>
+          </div>
         </DialogHeader>
-        
-        <div className="py-4">
-          {step === 1 && (
-            <CardDesignCarousel 
-              onSelectCard={handleSelectCard}
-              userName={userName}
-            />
-          )}
-          
-          {step === 2 && selectedCard && (
-            <div className="flex flex-col items-center space-y-6">
-              <div className="relative w-64 perspective-1000 transition-all duration-500">
-                <EcoTabCard 
-                  balance={0}
-                  cardNumber={selectedCard.cardNumber}
-                  userName={userName}
-                  className={cn(
-                    "h-full shadow-lg transform transition-all duration-500",
-                    selectedCard.gradient
-                  )}
-                />
-              </div>
-              
-              <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/30">
-                <AlertDescription>
-                  Ready to use your coins? Activate your EcoTab now!
-                </AlertDescription>
-              </Alert>
-              
-              <div className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-900 space-y-4 w-full">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">One-time activation fee:</span>
-                  <span className="font-bold">AED 60</span>
-                </div>
-                
-                <Button 
-                  onClick={handleNextStep}
-                  className="w-full bg-eco hover:bg-eco-dark"
-                >
-                  Pay & Activate
-                </Button>
-              </div>
+
+        <div className="flex-grow flex items-center justify-center overflow-hidden">
+          {step === 1 ? (
+            <div className="h-full w-full flex items-center justify-center">
+              <CardDesignCarousel
+                userName={userName}
+                onSelectCard={handleSelectCard}
+              />
             </div>
-          )}
-          
-          {step === 3 && (
-            <div className="flex flex-col items-center space-y-6">
-              <div className="relative w-64 h-80 perspective-1000">
-                <div 
-                  className={`w-full h-full transition-all duration-1000 ${
-                    cardInEnvelope ? 'translate-y-[-10%]' : ''
-                  }`}
-                >
-                  <div className="bg-amber-100/80 dark:bg-amber-900/20 p-6 rounded-lg h-64 flex items-center justify-center">
-                    <div className="relative">
-                      <Package className="h-20 w-20 text-amber-700 opacity-30" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <CreditCard className="h-10 w-10 text-eco" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-center space-y-4">
-                <h3 className="text-lg font-medium">Your card is ready!</h3>
-                <p className="text-sm text-muted-foreground">
-                  Your physical EcoTab card will be shipped to your address. 
-                  Meanwhile, you can start using the virtual card immediately!
+          ) : (
+            <div className="p-6 h-full w-full flex flex-col items-center justify-center">
+              <div className="text-center space-y-6 max-w-md">
+                <h2 className="text-2xl font-bold">Ready to use your coins?</h2>
+                <p className="text-muted-foreground">
+                  Activate your EcoTab card now to start using your ecoCoins at partner 
+                  stores and unlock exclusive rewards!
                 </p>
                 
-                <Button 
-                  onClick={handleActivate} 
-                  className="bg-eco hover:bg-eco-dark"
+                <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-lg mb-4">
+                  <p className="text-sm text-muted-foreground mb-2">One-time activation fee</p>
+                  <p className="text-3xl font-bold">AED 60</p>
+                </div>
+
+                <Button
+                  onClick={handleActivateCard}
+                  className="w-full bg-eco hover:bg-eco-dark"
+                  disabled={isProcessing}
                 >
-                  Start Using My Card
+                  {isProcessing ? "Processing..." : "Pay & Activate"}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setStep(1)} 
+                  className="w-full"
+                >
+                  Back to Card Selection
                 </Button>
               </div>
             </div>
@@ -149,11 +131,6 @@ const CardActivationFlow: React.FC<CardActivationFlowProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
-
-// Helper function from utils
-const cn = (...classes: (string | undefined | boolean)[]) => {
-  return classes.filter(Boolean).join(" ");
 };
 
 export default CardActivationFlow;

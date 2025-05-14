@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { 
   Carousel,
   CarouselContent,
@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import EcoTabCard from "./EcoTabCard";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CardDesign {
   id: string;
@@ -34,6 +35,7 @@ const CardDesignCarousel: React.FC<CardDesignCarouselProps> = ({
   const [cardRotation, setCardRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+  const isMobile = useIsMobile();
 
   // Sample card designs with different gradients
   const cardDesigns: CardDesign[] = [
@@ -118,17 +120,18 @@ const CardDesignCarousel: React.FC<CardDesignCarouselProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-8 w-full">
-      <h2 className="text-2xl font-bold">Choose Your Card Design</h2>
+    <div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-6">Choose Your Card Design</h2>
       
-      <div className="w-full">
+      <div className="w-full flex-grow flex items-center justify-center">
         <Carousel className="w-full">
           <CarouselContent>
             {cardDesigns.map((card) => (
               <CarouselItem key={card.id} className="flex justify-center">
                 <div 
                   className={cn(
-                    "relative perspective-1000 w-64 h-96 transition-all duration-300 cursor-pointer",
+                    "relative perspective-1000 transition-all duration-300 cursor-pointer",
+                    isMobile ? "w-56 h-80" : "w-64 h-96",
                     selectedCard?.id === card.id ? "scale-105" : "scale-90 opacity-90"
                   )}
                   onClick={() => setSelectedCard(card)}
@@ -166,15 +169,15 @@ const CardDesignCarousel: React.FC<CardDesignCarouselProps> = ({
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-2 bg-white/80 hover:bg-white" />
-          <CarouselNext className="right-2 bg-white/80 hover:bg-white" />
+          <CarouselPrevious className="left-0 md:left-2 bg-white/80 hover:bg-white" />
+          <CarouselNext className="right-0 md:right-2 bg-white/80 hover:bg-white" />
         </Carousel>
       </div>
       
       {selectedCard && (
-        <div className="text-center">
-          <p className="text-lg font-medium mb-2">{selectedCard.name}</p>
-          <Button onClick={handleSelectCard} className="bg-eco hover:bg-eco-dark mt-4">
+        <div className="text-center mt-4 mb-2">
+          <p className="text-lg font-medium mb-3">{selectedCard.name}</p>
+          <Button onClick={handleSelectCard} className="bg-eco hover:bg-eco-dark">
             Select This Card
           </Button>
         </div>
