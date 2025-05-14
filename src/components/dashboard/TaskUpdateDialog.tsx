@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Task } from '@/types';
+import { Task, TaskStatus } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -19,7 +19,7 @@ interface TaskUpdateDialogProps {
 }
 
 const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClose, onTaskUpdated }) => {
-  const [status, setStatus] = useState(task.status);
+  const [status, setStatus] = useState<TaskStatus>(task.status);
   const [isLoading, setIsLoading] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
 
@@ -163,7 +163,10 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
           {task.status !== 'Paid' && (
             <div className="space-y-2 pt-4">
               <Label htmlFor="status">Update Status</Label>
-              <Select value={status} onValueChange={setStatus}>
+              <Select 
+                value={status} 
+                onValueChange={(value: TaskStatus) => setStatus(value)}
+              >
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
