@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -12,22 +12,55 @@ import EcoTabActivationDialog from "@/components/wallet/EcoTabActivationDialog";
 import GiftCard, { GiftCardType } from "@/components/wallet/GiftCard";
 import { Gift, Wallet as WalletIcon, Ticket } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CardActivationFlow from "@/components/wallet/CardActivationFlow";
+
+interface CardDesign {
+  id: string;
+  name: string;
+  gradient: string;
+  cardNumber: string;
+  userName: string;
+}
 
 const Wallet = () => {
   const [balance, setBalance] = useState(mockUser.ecoCoins);
   const [cardBalance, setCardBalance] = useState(200); // Example starting card balance
   const [transferAmount, setTransferAmount] = useState(50);
   const [isCardDialogOpen, setIsCardDialogOpen] = useState(false);
-  const [isCardActivated, setIsCardActivated] = useState(true); // Set to false to require activation
+  const [isCardActivated, setIsCardActivated] = useState(false);
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(true);
+  const [isCardSelectionOpen, setIsCardSelectionOpen] = useState(false);
+  const [selectedCardDesign, setSelectedCardDesign] = useState<CardDesign | null>(null);
   const [completedTasks, setCompletedTasks] = useState(0);
 
-  // Load completed tasks count from local storage
-  React.useEffect(() => {
+  // Load completed tasks count and card activation state from local storage
+  useEffect(() => {
     const storedCount = localStorage.getItem("ecoDropCompletedTasks");
     if (storedCount) {
       setCompletedTasks(parseInt(storedCount));
     }
+    
+    const cardActivated = localStorage.getItem("ecoTabCardActivated");
+    if (cardActivated === "true") {
+      setIsCardActivated(true);
+      setIsFirstTimeUser(false);
+    }
+    
+    const cardDesign = localStorage.getItem("ecoTabCardDesign");
+    if (cardDesign) {
+      setSelectedCardDesign(JSON.parse(cardDesign));
+    }
   }, []);
+
+  useEffect(() => {
+    // Show card selection for first time users after a short delay
+    if (isFirstTimeUser && !isCardActivated) {
+      const timer = setTimeout(() => {
+        setIsCardSelectionOpen(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstTimeUser, isCardActivated]);
 
   const handleTransfer = () => {
     if (transferAmount <= 0) {
@@ -47,13 +80,27 @@ const Wallet = () => {
   };
 
   const handleCardClick = () => {
-    setIsCardDialogOpen(true);
+    if (isCardActivated) {
+      setIsCardDialogOpen(true);
+    } else {
+      setIsCardSelectionOpen(true);
+    }
   };
 
   const handleActivateCard = () => {
     // Here you would typically process a payment of 60 AED
     toast.success("Card purchase successful! Your EcoTab Card is now active.");
     setIsCardActivated(true);
+    setIsFirstTimeUser(false);
+    localStorage.setItem("ecoTabCardActivated", "true");
+  };
+
+  const handleCardSelectionComplete = (cardDesign: CardDesign) => {
+    setSelectedCardDesign(cardDesign);
+    setIsCardActivated(true);
+    setIsFirstTimeUser(false);
+    localStorage.setItem("ecoTabCardActivated", "true");
+    localStorage.setItem("ecoTabCardDesign", JSON.stringify(cardDesign));
   };
 
   // Enhanced flight rewards with flight ticket data
@@ -182,11 +229,28 @@ const Wallet = () => {
         <TabsContent value="ecotab">
           <div>
             <div onClick={handleCardClick} className="cursor-pointer">
-              <EcoTabCard 
-                balance={cardBalance} 
-                cardNumber={mockUser.ecotabCardNumber}
-                userName={mockUser.name}
-              />
+              {isCardActivated && selectedCardDesign ? (
+                <EcoTabCard 
+                  balance={cardBalance} 
+                  cardNumber={selectedCardDesign.cardNumber}
+                  userName={mockUser.name}
+                  className={selectedCardDesign.gradient}
+                />
+              ) : (
+                <div className="p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-center">
+                  <WalletIcon className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+                  <p className="font-medium text-lg">Activate Your EcoTab Card</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Choose a design and activate your card to start using ecoCoins
+                  </p>
+                  <Button 
+                    onClick={() => setIsCardSelectionOpen(true)}
+                    className="mt-4 bg-eco hover:bg-eco-dark"
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              )}
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
               {isCardActivated 
@@ -278,6 +342,13 @@ const Wallet = () => {
         ecoCoinsBalance={balance}
         onPurchase={handleActivateCard}
         isActivated={isCardActivated}
+      />
+      
+      <CardActivationFlow 
+        isOpen={isCardSelectionOpen}
+        onClose={() => setIsCardSelectionOpen(false)}
+        userName={mockUser.name}
+        onComplete={handleCardSelectionComplete}
       />
     </div>
   );
