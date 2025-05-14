@@ -4,6 +4,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { cleanupAuthState } from '@/utils/authUtils';
 
 interface AuthContextType {
   session: Session | null;
@@ -31,8 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (event === 'SIGNED_IN') {
           toast.success('Signed in successfully!');
+          // Defer loading user data to prevent potential deadlocks
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 0);
         } else if (event === 'SIGNED_OUT') {
           toast.info('Signed out');
+          navigate('/auth');
         }
       }
     );
@@ -45,10 +51,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signUp = async (email: string, password: string, username: string) => {
     try {
+      // Clean up existing auth state before signup
+      cleanupAuthState();
+      
+      // Try to sign out globally first (ignore errors)
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (error) {
+        // Continue even if this fails
+      }
+      
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -71,11 +87,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Clean up existing auth state before login
+      cleanupAuthState();
+      
+      // Try to sign out globally first (ignore errors)
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (error) {
+        // Continue even if this fails
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) throw error;
       
-      navigate('/dashboard');
+      // Navigation is handled by onAuthStateChange
+      // Force refresh if needed for a clean slate
+      // window.location.href = '/dashboard';
     } catch (error: any) {
       toast.error(error.message || 'Sign in failed');
       throw error;
@@ -84,8 +112,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-      navigate('/auth');
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Then attempt global sign out
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Force page reload for a clean state on critical auth operation
+      window.location.href = '/auth';
     } catch (error: any) {
       toast.error(error.message || 'Sign out failed');
     }
