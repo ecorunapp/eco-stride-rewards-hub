@@ -19,7 +19,7 @@ const TaskStatusChip: React.FC<TaskStatusChipProps> = ({ status }) => {
       case 'Completed':
         return 'default';
       case 'Paid':
-        return 'secondary'; // Changed from 'success' to 'secondary' as 'success' is not a valid variant
+        return 'secondary'; // Using secondary instead of success
       default:
         return 'outline';
     }

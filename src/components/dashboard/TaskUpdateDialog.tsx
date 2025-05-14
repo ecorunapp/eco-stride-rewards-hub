@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
 import { Task, TaskStatus } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
 import TaskStatusChip from './TaskStatusChip';
-import { Loader2, MapPin, Calendar, DollarSign, AlertCircle } from 'lucide-react';
+import { Loader2, MapPin, Calendar, DollarSign, AlertCircle, CheckCircle2, Truck } from 'lucide-react';
 
 interface TaskUpdateDialogProps {
   task: Task;
@@ -34,10 +34,18 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
         
       if (error) throw error;
       
-      toast.success(`Task status updated to ${status}`);
+      toast({
+        title: "Status Updated",
+        description: `Task status updated to ${status}`,
+        variant: "default",
+      });
       onTaskUpdated();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update task status');
+      toast({
+        title: "Update Failed",
+        description: error.message || 'Failed to update task status',
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -68,10 +76,18 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
         
       if (taskError) throw taskError;
       
-      toast.success('Payment processed successfully');
+      toast({
+        title: "Payment Completed",
+        description: "Payment processed successfully",
+        variant: "default",
+      });
       onTaskUpdated();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to process payment');
+      toast({
+        title: "Payment Failed",
+        description: error.message || 'Failed to process payment',
+        variant: "destructive",
+      });
     } finally {
       setIsPaying(false);
     }
@@ -96,6 +112,40 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
   
   const canUpdateStatus = task.status !== 'Paid' && status !== task.status;
   const canPay = task.status === 'Completed';
+  
+  const getStatusPrompt = () => {
+    switch(status) {
+      case 'Pending':
+        return "This delivery is waiting for a runner to accept it.";
+      case 'Accepted':
+        return "A runner has accepted this task and will pick up the package soon.";
+      case 'In Progress':
+        return "The package is being transported to its destination.";
+      case 'Completed':
+        return "The delivery has been completed successfully.";
+      case 'Paid':
+        return "Payment for this delivery has been processed.";
+      default:
+        return "";
+    }
+  };
+  
+  const getStatusIcon = () => {
+    switch(status) {
+      case 'Pending':
+        return <AlertCircle className="h-4 w-4 text-amber-500" />;
+      case 'Accepted':
+        return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
+      case 'In Progress':
+        return <Truck className="h-4 w-4 text-blue-500" />;
+      case 'Completed':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'Paid':
+        return <DollarSign className="h-4 w-4 text-eco" />;
+      default:
+        return <AlertCircle className="h-4 w-4" />;
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -103,7 +153,7 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
         <DialogHeader>
           <DialogTitle>Task Details</DialogTitle>
           <DialogDescription>
-            Manage your task and update its status
+            Manage your delivery task and update its status
           </DialogDescription>
         </DialogHeader>
         
@@ -161,11 +211,11 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
           </div>
           
           {task.status !== 'Paid' && (
-            <div className="space-y-2 pt-4">
-              <Label htmlFor="status">Update Status</Label>
+            <div className="space-y-2 pt-4 border-t border-gray-100 dark:border-gray-800">
+              <Label htmlFor="status">Update Delivery Status</Label>
               <Select 
                 value={status} 
-                onValueChange={(value: TaskStatus) => setStatus(value)}
+                onValueChange={(value) => setStatus(value as TaskStatus)}
               >
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
@@ -178,6 +228,11 @@ const TaskUpdateDialog: React.FC<TaskUpdateDialogProps> = ({ task, isOpen, onClo
                   ))}
                 </SelectContent>
               </Select>
+              
+              <div className="flex items-center gap-2 mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-md">
+                {getStatusIcon()}
+                <p className="text-sm text-muted-foreground">{getStatusPrompt()}</p>
+              </div>
             </div>
           )}
           
