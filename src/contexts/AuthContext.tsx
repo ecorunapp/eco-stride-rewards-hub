@@ -17,12 +17,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Fixed AuthProvider to not depend on router hooks initially
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
+  
+  // Create a fake navigate function that will be replaced when the component mounts
+  const [navigate, setNavigate] = useState<(path: string) => void>(() => 
+    (path: string) => console.log(`Navigation attempted to ${path} but router not ready`)
+  );
+  
+  // Initialize auth state without router dependencies
   useEffect(() => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -32,13 +38,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (event === 'SIGNED_IN') {
           toast.success('Signed in successfully!');
-          // Defer loading user data to prevent potential deadlocks
+          // Defer navigation until router is ready
           setTimeout(() => {
-            navigate('/dashboard');
+            window.location.href = '/dashboard';
           }, 0);
         } else if (event === 'SIGNED_OUT') {
           toast.info('Signed out');
-          navigate('/auth');
+          // Defer navigation until router is ready
+          setTimeout(() => {
+            window.location.href = '/auth';
+          }, 0);
         }
       }
     );
@@ -51,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []); // No router dependency here
 
   const signUp = async (email: string, password: string, username: string) => {
     try {
@@ -78,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       
       toast.success('Registration successful! Please check your email to verify your account.');
-      navigate('/auth');
+      window.location.href = '/auth'; // Use direct navigation instead of navigate
     } catch (error: any) {
       toast.error(error.message || 'An error occurred during sign up');
       throw error;
@@ -102,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       
       // Navigation is handled by onAuthStateChange
-      // Force refresh if needed for a clean slate
+      // Force refresh for a clean slate
       // window.location.href = '/dashboard';
     } catch (error: any) {
       toast.error(error.message || 'Sign in failed');

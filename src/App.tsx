@@ -17,12 +17,13 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
+// Wrap the entire App with AuthProvider first, then BrowserRouter
 const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <BrowserRouter>
-          <AuthProvider>
+        <AuthProvider>
+          <BrowserRouter>
             <Routes>
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Index />} />
@@ -36,8 +37,8 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AuthProvider>
-        </BrowserRouter>
+          </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   </React.StrictMode>
